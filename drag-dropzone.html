@@ -1,0 +1,34 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`drag-dropzone`
+Dropzone for files and DOM elements in Polymer 1.x
+
+@demo demo/index.html
+-->
+
+<dom-module id="drag-dropzone">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'drag-dropzone',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'drag-dropzone',
+        },
+      },
+
+    });
+  </script>
+</dom-module>
