@@ -63,6 +63,8 @@ document.querySelector('drag-dropzone').addEventListener('item-added', e => {
 })
 ```
 
+There's an open [Issue][3] for the paste issues.
+
 ## Running Tests
 
 ```
@@ -98,3 +100,4 @@ SOFTWARE.
 
 [1]: https://github.com/nicholaswmin
 [2]: https://davidwalsh.name/javascript-debounce-function
+[3]: https://github.com/TheProfs/drag-dropzone/issues/3
