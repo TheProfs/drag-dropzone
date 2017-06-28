@@ -45,7 +45,22 @@ you want to receive when it's dropped on the drop zone.
     console.log(e.detail); // includes the item
   })
 </script>
+```
 
+### Gotchas
+
+#### The `paste` event is attached on `window`.
+
+If you have more than one dropzone per page, the `item-added` event will
+be fired from all `<drag-dropzone>` elements. In that case it makes sense
+to [debounce][2] the event so you handle it only *once*.
+
+```javascript
+document.querySelector('drag-dropzone').addEventListener('item-added', e => {
+  debounce(() => {
+    // handle event
+  }, 200);
+})
 ```
 
 ## Running Tests
@@ -82,3 +97,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 [1]: https://github.com/nicholaswmin
+[2]: https://davidwalsh.name/javascript-debounce-function
