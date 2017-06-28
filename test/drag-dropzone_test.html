@@ -134,7 +134,7 @@
         });
 
         it('should fire an event containing the File and drop position when a File is dropped within bounds', done => {
-          element.addEventListener('item-added', e => {
+          const test = (e) => {
             expect(e.detail).to.have.property('type');
             expect(e.detail).to.have.property('items');
             expect(e.detail).to.have.property('position');
@@ -155,8 +155,12 @@
 
             expect(e.detail.position.x).to.equal(areas.withinElementBounds.clientX);
             expect(e.detail.position.y).to.equal(areas.withinElementBounds.clientY);
+
+            element.removeEventListener('item-added', test);
             done();
-          });
+          };
+
+          element.addEventListener('item-added', test);
 
           dragMock
           .dragStart(testFile)
@@ -167,7 +171,7 @@
         });
 
         it('should fire an event containing the File and viewport center as position when a File is pasted within bounds', done => {
-          element.addEventListener('item-added', e => {
+          const test = (e) => {
             expect(e.detail).to.have.property('type');
             expect(e.detail).to.have.property('items');
             expect(e.detail).to.have.property('position');
@@ -188,8 +192,12 @@
 
             expect(e.detail.position.x).to.equal(window.innerWidth / 2);
             expect(e.detail.position.y).to.equal(window.innerHeight / 2);
+
+            element.removeEventListener('item-added', test);
             done();
-          });
+          }
+
+          element.addEventListener('item-added', test);
 
           const fakePasteEvent = new CustomEvent('paste', {
             detail: {
@@ -199,11 +207,11 @@
             }
           });
 
-          dropTarget.dispatchEvent(fakePasteEvent);
+          window.dispatchEvent(fakePasteEvent);
         });
 
         it('should fire an event containing the DOMElement Data and drop position when a DOM Element is dropped within bounds', done => {
-          element.addEventListener('item-added', e => {
+          const test = (e) => {
             expect(e.detail).to.have.property('type');
             expect(e.detail).to.have.property('items');
             expect(e.detail).to.have.property('position');
@@ -222,8 +230,12 @@
 
             expect(e.detail.position.x).to.equal(areas.withinElementBounds.clientX);
             expect(e.detail.position.y).to.equal(areas.withinElementBounds.clientY);
+
+            element.removeEventListener('item-added', test);
             done();
-          });
+          }
+
+          element.addEventListener('item-added',test);
 
           dragMock
           .dragStart(testDraggable)
