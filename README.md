@@ -2,6 +2,10 @@
 
 # \<drag-dropzone\>
 
+```bash
+$ bower install --save drag-dropzone
+```
+
 ## What's cool
 
 - Minimalistic, has **0** dependencies
