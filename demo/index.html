@@ -13,16 +13,105 @@
     <link rel="import" href="../drag-dropzone.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
+      .demo-snippet {
+        position: relative;
+      }
+
+      em {
+        color: #999;
+      }
+
+      p {
+        color: #444;
+      }
+
+      drag-dropzone {
+        position: relative;
+        width: 100%;
+        height: 300px;
+        z-index: 1;
+      }
+
+      div[draggable] {
+        display: inline-block;
+        margin-bottom: 1em;
+        padding: 0.35em;
+        background: #2196F3;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      button {
+        position: absolute;
+        width: 160px;
+        height: 32px;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        z-index: 0;
+      }
     </style>
   </head>
   <body>
     <div class="vertical-section-container centered">
-      <h3>Basic drag-dropzone demo</h3>
-      <demo-snippet>
+      <h2>Basic drag-dropzone demo</h2>
+      <em> All events are logged in the console </em>
+      <p>
+        Drag the draggable HTML element below, or drag a File directly
+        from your device.
+      </p>
+
+      <div ondragstart="drag(event)" draggable="true">
+        Drag me on the dropzone
+      </div>
+
+      <demo-snippet class="demo-snippet">
         <template>
           <drag-dropzone></drag-dropzone>
         </template>
       </demo-snippet>
+
+      <h3>Copy/pasting works as well</h3>
+
+      <p> You can also copy/paste files from your device onto the dropzone </p>
+
+      <demo-snippet class="demo-snippet">
+        <template>
+          <drag-dropzone></drag-dropzone>
+        </template>
+      </demo-snippet>
+
+      <h3>Doesn't block clicks/pointer-events</h3>
+
+      <p>
+        The dropzone doesn't react to CSS pointer-events. It only becomes active
+        when an item, either a File or an HTML draggable element is dragged
+        over it.
+      </p>
+
+      <demo-snippet class="demo-snippet">
+        <template>
+          <button>
+            I'm behind the dropzone but still clickable!
+          </button>
+          <drag-dropzone></drag-dropzone>
+        </template>
+      </demo-snippet>
+
+      <script>
+        function drag(e) {
+          e.dataTransfer.setData('type', 'DOMElement');
+          e.dataTransfer.setData('data', 'foo-bar');
+        }
+
+        document.querySelectorAll('.demo-snippet').forEach(snippet => {
+          snippet.addEventListener('item-added', console.log)
+        })
+      </script>
     </div>
   </body>
 </html>
