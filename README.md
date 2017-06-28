@@ -47,7 +47,7 @@ you want to receive when it's dropped on the drop zone.
 </script>
 ```
 
-### Gotchas
+## Gotchas
 
 #### The `paste` event is attached on `window`.
 
