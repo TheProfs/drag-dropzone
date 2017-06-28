@@ -15,7 +15,7 @@
 <drag-dropzone></drag-dropzone>
 
 <script>
-  document.querySelector('dropzone').addEventListener('item-added', e => {
+  document.querySelector('drag-dropzone').addEventListener('item-added', e => {
     console.log(e.detail);
     // logs item and dropped position
   })
@@ -37,7 +37,7 @@ you want to receive when it's dropped on the drop zone.
     e.dataTransfer.setData('data', 'foo-bar');
   }
 
-  document.querySelector('dropzone').addEventListener('item-added', e => {
+  document.querySelector('drag-dropzone').addEventListener('item-added', e => {
     console.log(e.detail); // includes the item
   })
 </script>
