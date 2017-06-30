@@ -8,7 +8,7 @@ $ bower install --save drag-dropzone
 
 ## What's cool
 
-- Includes and implements `dragDropBehavior` which can be attached to
+- Includes and implements `dragDropzoneBehavior` which can be attached to
 any element. You can either use the element itself, or just the behavior.
 - Lightweight, has **0** dependencies
 - Handles both `Files` and draggable `DOMElements`
@@ -50,7 +50,7 @@ you want to receive when it's dropped on the drop zone.
 
 ## Using the Behavior
 
-The element includes `dragDropBehavior` which can be easily attached to
+The element includes `dragDropzoneBehavior` which can be easily attached to
 any element.
 
 ```html
