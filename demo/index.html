@@ -85,23 +85,6 @@
         </template>
       </demo-snippet>
 
-      <h3>Doesn't block clicks/pointer-events</h3>
-
-      <p>
-        The dropzone doesn't react to CSS pointer-events. It only becomes active
-        when an item, either a File or an HTML draggable element is dragged
-        over it.
-      </p>
-
-      <demo-snippet class="demo-snippet">
-        <template>
-          <button>
-            I'm behind the dropzone but still clickable!
-          </button>
-          <drag-dropzone></drag-dropzone>
-        </template>
-      </demo-snippet>
-
       <script>
         function drag(e) {
           e.dataTransfer.setData('type', 'DOMElement');
@@ -109,7 +92,7 @@
         }
 
         document.querySelectorAll('.demo-snippet').forEach(snippet => {
-          snippet.addEventListener('item-added', console.log)
+          snippet.addEventListener('item-dropped', console.log)
         })
       </script>
     </div>

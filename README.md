@@ -8,10 +8,11 @@ $ bower install --save drag-dropzone
 
 ## What's cool
 
-- Minimalistic, has **0** dependencies
+- Includes and implements `dragDropBehavior` which can be attached to
+any element. You can either use the element itself, or just the behavior.
+- Lightweight, has **0** dependencies
 - Handles both `Files` and draggable `DOMElements`
 - Handles `paste` as well
-- Doesn't block pointer events to elements stacked below it.
 
 ## Basic Usage
 
@@ -19,7 +20,7 @@ $ bower install --save drag-dropzone
 <drag-dropzone></drag-dropzone>
 
 <script>
-  document.querySelector('drag-dropzone').addEventListener('item-added', e => {
+  document.querySelector('drag-dropzone').addEventListener('item-dropped', e => {
     console.log(e.detail);
     // logs item and dropped position
   })
@@ -41,22 +42,55 @@ you want to receive when it's dropped on the drop zone.
     e.dataTransfer.setData('data', 'foo-bar');
   }
 
-  document.querySelector('drag-dropzone').addEventListener('item-added', e => {
+  document.querySelector('drag-dropzone').addEventListener('item-dropped', e => {
     console.log(e.detail); // includes the item
   })
 </script>
+```
+
+## Using the Behavior
+
+The element includes `dragDropBehavior` which can be easily attached to
+any element.
+
+```html
+<dom-module id="my-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+        text-align: center;
+        padding: 1em;
+      }
+    </style>
+    <label hidden$="[[!itemDragged]]">Drop Here</label>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'my-element',
+
+      behaviors: [
+        dragDropBehavior
+      ]
+    });
+  </script>
+</dom-module>
 ```
 
 ## Gotchas
 
 #### The `paste` event is attached on `window`.
 
-If you have more than one dropzone per page, the `item-added` event will
-be fired from all `<drag-dropzone>` elements. In that case it makes sense
-to [debounce][2] the event so you handle it only *once*.
+If you have more than one dropzone per page, the `item-dropped` event will
+be fired from all `<drag-dropzone>` elements when pasting.
+
+In that case it makes sense to [debounce][2] the event so you handle it
+only *once*.
 
 ```javascript
-document.querySelector('drag-dropzone').addEventListener('item-added', e => {
+document.querySelector('drag-dropzone').addEventListener('item-dropped', e => {
   debounce(() => {
     // handle event
   }, 200);

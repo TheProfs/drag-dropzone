@@ -48,26 +48,12 @@
     </test-fixture>
 
     <script>
-      let element, areas, testFile, testDraggable, dropTarget;
+      let element, testFile, testDraggable;
 
       beforeEach(() => {
         element = fixture('basic');
-
         testFile = document.querySelector('#file');
         testDraggable = document.querySelector('#draggable');
-        dropTarget = Polymer.dom(element.root).querySelector('#dropzone');
-
-        areas = {
-          withinElementBounds: {
-            clientX: dropTarget.getBoundingClientRect().left + dropTarget.offsetWidth / 2,
-            clientY:  dropTarget.getBoundingClientRect().top + dropTarget. offsetWidth / 2
-          },
-
-          outsideElementBounds: {
-            clientX: dropTarget.getBoundingClientRect().left + dropTarget.offsetWidth + 100,
-            clientY:  dropTarget.getBoundingClientRect().top + dropTarget. offsetWidth + 100
-          }
-        }
       })
 
       describe('drag-dropzone', () => {
@@ -76,64 +62,70 @@
         });
 
         it('should be non-active on instantiation', () => {
-          expect(element.active).to.be.false;
+          expect(element.itemDragged).to.be.false;
         });
 
         it('should activate if an item is dragged within bounds', done => {
           dragMock
-          .dragStart(window)
-          .dragEnter(window)
-          .dragOver(window, areas.withinElementBounds, (e, eName) => {
+          .dragStart(testDraggable)
+          .dragEnter(element)
+          .dragOver(element, (e, eName) => {
             setTimeout(() => {
-              expect(element.active).to.be.true;
+              expect(element.itemDragged).to.be.true;
             }, 100);
           })
           .delay(200)
-          .drop(dropTarget, () => {
+          .drop(element, () => {
             done();
           });
         });
 
+
         it('should deactivate if item is moved out of bounds without dropping', done => {
           dragMock
-          .dragStart(window)
-          .dragEnter(window)
-          .dragOver(window, areas.withinElementBounds, (e, eName) => {
+          .dragStart(testDraggable)
+          .dragEnter(element)
+          .dragOver(element, (e, eName) => {
             setTimeout(() => {
-              expect(element.active).to.be.true;
+              expect(element.itemDragged).to.be.true;
             }, 100);
           })
           .delay(200)
-          .dragOver(window, areas.outsideElementBounds, (e, eName) => {
+          .dragLeave(element, (e, eName) => {
             setTimeout(() => {
-              expect(element.active).to.be.false;
+              expect(element.itemDragged).to.be.false;
             }, 100);
           })
           .delay(200)
-          .drop(dropTarget, () => {
+          .drop(element, () => {
             done();
           });
         });
 
         it('should deactivate after item is dropped within bounds', done => {
           dragMock
-          .dragStart(window)
-          .dragEnter(window)
-          .dragOver(window, areas.withinElementBounds, (e, eName) => {
+          .dragStart(testDraggable)
+          .dragEnter(element)
+          .dragOver(element, (e, eName) => {
             setTimeout(() => {
-              expect(element.active).to.be.true;
+              expect(element.itemDragged).to.be.true;
             }, 100);
           })
           .delay(200)
-          .drop(dropTarget, () => {
+          .drop(element, () => {
             setTimeout(() => {
-              expect(element.active).to.be.false;
+              expect(element.itemDragged).to.be.false;
               done();
             }, 100);
           });
         });
 
         it('should fire an event containing the File and drop position when a File is dropped within bounds', done => {
+          const dropPosition = {
+            clientX: element.getBoundingClientRect().left + 50,
+            clientY: element.getBoundingClientRect().top + 50
+          }
+
           const test = (e) => {
             expect(e.detail).to.have.property('type');
             expect(e.detail).to.have.property('items');
@@ -153,21 +145,21 @@
 
             expect(e.detail.items).to.have.length(0);
 
-            expect(e.detail.position.x).to.equal(areas.withinElementBounds.clientX);
-            expect(e.detail.position.y).to.equal(areas.withinElementBounds.clientY);
+            expect(e.detail.position.x).to.equal(dropPosition.clientX);
+            expect(e.detail.position.y).to.equal(dropPosition.clientY);
 
-            element.removeEventListener('item-added', test);
+            element.removeEventListener('item-dropped', test);
             done();
           };
 
-          element.addEventListener('item-added', test);
+          element.addEventListener('item-dropped', test);
 
           dragMock
           .dragStart(testFile)
-          .dragEnter(window)
-          .dragOver(window, areas.withinElementBounds)
+          .dragEnter(element)
+          .dragOver(element)
           .delay(200)
-          .drop(dropTarget, areas.withinElementBounds);
+          .drop(element, dropPosition);
         });
 
         it('should fire an event containing the File and viewport center as position when a File is pasted within bounds', done => {
@@ -193,11 +185,11 @@
             expect(e.detail.position.x).to.equal(window.innerWidth / 2);
             expect(e.detail.position.y).to.equal(window.innerHeight / 2);
 
-            element.removeEventListener('item-added', test);
+            element.removeEventListener('item-dropped', test);
             done();
           }
 
-          element.addEventListener('item-added', test);
+          element.addEventListener('item-dropped', test);
 
           const fakePasteEvent = new CustomEvent('paste', {
             detail: {
@@ -211,6 +203,11 @@
         });
 
         it('should fire an event containing the DOMElement Data and drop position when a DOM Element is dropped within bounds', done => {
+          const dropPosition = {
+            clientX: element.getBoundingClientRect().left + 50,
+            clientY: element.getBoundingClientRect().top + 50
+          }
+
           const test = (e) => {
             expect(e.detail).to.have.property('type');
             expect(e.detail).to.have.property('items');
@@ -228,21 +225,21 @@
 
             expect(e.detail.items).to.have.length(1);
 
-            expect(e.detail.position.x).to.equal(areas.withinElementBounds.clientX);
-            expect(e.detail.position.y).to.equal(areas.withinElementBounds.clientY);
+            expect(e.detail.position.x).to.equal(dropPosition.clientX);
+            expect(e.detail.position.y).to.equal(dropPosition.clientY);
 
-            element.removeEventListener('item-added', test);
+            element.removeEventListener('item-dropped', test);
             done();
           }
 
-          element.addEventListener('item-added',test);
+          element.addEventListener('item-dropped',test);
 
           dragMock
           .dragStart(testDraggable)
-          .dragEnter(window)
-          .dragOver(window, areas.withinElementBounds)
+          .dragEnter(element)
+          .dragOver(element)
           .delay(200)
-          .drop(dropTarget, areas.withinElementBounds);
+          .drop(element, dropPosition);
         });
       });
     </script>

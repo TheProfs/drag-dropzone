@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="drag-drop-behavior.html">
 
 <!--
 `drag-dropzone`
@@ -13,41 +14,32 @@ Dropzone for files and DOM elements in Polymer 1.x
       :host {
         display: flex;
         position: relative;
-        pointer-events: none;
         font-family: sans-serif;
       }
 
-      .dropzone {
+      .dropzone-overlay {
+        display: none;
         position: absolute;
-        height: 100%;
         width: 100%;
+        height: 100%;
         top: 0;
         left: 0;
-      }
-
-      .dropzone[active] {
-        pointer-events: all;
-        background: rgba(0, 0, 0, 0.8);
-      }
-
-      label {
-        display: none;
-        width: 100%;
         justify-content: center;
         align-items: center;
         text-align: center;
+        background: rgba(0, 0, 0, 0.85);
+        color: #009688;
         font-size: 24px;
         font-weight: lighter;
-        color: #009688;
-        z-index: 99;
+        z-index: 2;
+        pointer-events: none;
       }
 
-      label[active] {
+      .dropzone-overlay[visible] {
         display: flex;
       }
     </style>
-    <div id="dropzone" class="dropzone" active$="[[active]]"></div>
-    <label active$="[[active]]"> Drop Item </label>
+    <div class="dropzone-overlay" visible$="[[itemDragged]]">Drop Here</div>
   </template>
 
   <script>
@@ -55,100 +47,9 @@ Dropzone for files and DOM elements in Polymer 1.x
 
       is: 'drag-dropzone',
 
-      properties: {
-        active: {
-          type: Boolean,
-          value: false,
-          readOnly: true
-        }
-      },
-
-      attached: function() {
-        //@NOTE Since CSS `pointer-events` are disabled on this element, we
-        // resort to attaching some events on `window`
-        window.addEventListener('dragover', this._handleDrag.bind(this));
-        window.addEventListener('paste', this._handlePaste.bind(this));
-
-        this.$.dropzone.addEventListener('drop', this.handleItemDrop.bind(this));
-        this.$.dropzone.addEventListener('dragleave', this._deactivateDropzone.bind(this));
-        this.$.dropzone.addEventListener('mouseout', this._deactivateDropzone.bind(this));
-      },
-
-      handleItemDrop: function(e) {
-        const position = this._createPoint(e.clientX, e.clientY);
-        const itemType = e.dataTransfer.getData('type');
-
-        switch (itemType) {
-          case 'DOMElement':
-            this._itemAdded('DOMElement', [e.dataTransfer.getData('data')], position);
-            break;
-          default:
-            this._itemAdded('file', e.dataTransfer.files, position);
-        }
-
-        this._deactivateDropzone(e);
-      },
-
-      _itemAdded: function(type, items, position) {
-        this.fire('item-added', {type, items, position});
-      },
-
-      _handleDrag: function(e) {
-        const bbox = this.getBoundingClientRect();
-        const withinXAxis = e.clientX > bbox.left && e.clientX < (bbox.left + this.offsetWidth);
-        const withinYAxis = e.clientY > bbox.top && e.clientY < (bbox.top + this.offsetHeight);
-
-        if (withinXAxis && withinYAxis) {
-          this._activateDropzone(e);
-          return false;
-        }
-
-        this._deactivateDropzone(e);
-      },
-
-      _handlePaste: function(e) {
-        const position = this._createPoint();
-
-        // @NOTE For testing, since we can't really simulate `clipboardData`
-        if (e.detail && e.detail.fakeClipboardData) {
-          this._itemAdded('file', e.detail.fakeClipboardData.items, position);
-
-          return false;
-        }
-
-        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-
-        for (let index in items) {
-          if ({}.hasOwnProperty.call(items, index)) {
-            const item = items[index];
-
-            if (item.kind === "file") {
-              this._itemAdded('file', [item.getAsFile()], position);
-            }
-          }
-        }
-      },
-
-      _activateDropzone: function(e) {
-        this._setActive(true);
-
-        if (e) {
-          e.preventDefault();
-        }
-      },
-
-      _deactivateDropzone: function(e) {
-        this._setActive(false);
-
-        if (e) {
-          e.preventDefault();
-        }
-      },
-
-      _createPoint: function(x = window.innerWidth / 2, y = window.innerHeight / 2) {
-        return { x, y };
-      }
-
+      behaviors: [
+        dragDropBehavior
+      ]
     });
   </script>
 </dom-module>

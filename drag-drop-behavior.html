@@ -1,0 +1,88 @@
+<script>
+  /**
+   * @polymerBehavior dragDropBehavior
+   */
+  dragDropBehavior = {
+    properties: {
+      itemDragged: {
+        type: Boolean,
+        value: false,
+        readOnly: true
+      }
+    },
+
+    attached: function() {
+      this.addEventListener('dragenter', this._activateDropzone.bind(this));
+      this.addEventListener('dragleave', this._deactivateDropzone.bind(this));
+      this.addEventListener('dragover', this._cancelDefault.bind(this));
+      this.addEventListener('drop', this._handleItemDrop.bind(this));
+      window.addEventListener('paste', this._handlePaste.bind(this))
+    },
+
+    _handleItemDrop: function(e) {
+      const position = this._createPoint(e.clientX, e.clientY);
+      const itemType = e.dataTransfer.getData('type');
+
+      switch (itemType) {
+        case 'DOMElement':
+          this._itemDropped('DOMElement', [e.dataTransfer.getData('data')], position);
+          break;
+        default:
+          this._itemDropped('file', e.dataTransfer.files, position);
+      }
+
+      this._deactivateDropzone(e);
+    },
+
+    _itemDropped: function(type, items, position) {
+      this.fire('item-dropped', {type, items, position});
+    },
+
+    _activateDropzone: function(e) {
+      this._setItemDragged(true);
+
+      if (e) {
+        e.preventDefault();
+      }
+    },
+
+    _deactivateDropzone: function(e) {
+      this._setItemDragged(false);
+
+      if (e) {
+        e.preventDefault();
+      }
+    },
+
+    _cancelDefault: function(e) {
+      e.preventDefault();
+    },
+
+    _handlePaste: function(e) {
+      const position = this._createPoint();
+
+      // @NOTE For testing, since we can't really simulate `clipboardData`
+      if (e.detail && e.detail.fakeClipboardData) {
+        this._itemDropped('file', e.detail.fakeClipboardData.items, position);
+
+        return false;
+      }
+
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+
+      for (let index in items) {
+        if ({}.hasOwnProperty.call(items, index)) {
+          const item = items[index];
+
+          if (item.kind === "file") {
+            this._itemDropped('file', [item.getAsFile()], position);
+          }
+        }
+      }
+    },
+
+    _createPoint: function(x = window.innerWidth / 2, y = window.innerHeight / 2) {
+      return { x, y };
+    }
+  };
+</script>
