@@ -29,10 +29,19 @@
   <body>
     <!-- Test draggables -->
     <div class="draggables">
-      <div id="file" draggable> Fake File </div>
-      <div id="draggable" ondrag="drag(event)" draggable>Fake DOM element</div>
+      <div id="file" ondrag="dragStartFile(event)" draggable> Fake File </div>
+      <div id="draggable" ondrag="dragStartDOMElement(event)" draggable>Fake DOM element</div>
       <script>
-        window.drag = (e) => {
+        window.dragStartFile = (e) => {
+          e.dataTransfer.setData('fake-files', [
+            { type: 'application/pdf' },
+            { type: 'image/jpeg' },
+            { type: 'image/svg' }
+          ]);
+          e.preventDefault();
+        }
+
+        window.dragStartDOMElement = (e) => {
           e.dataTransfer.setData('type', 'DOMElement');
           e.dataTransfer.setData('data', 'foo-bar');
           e.preventDefault();
@@ -65,7 +74,7 @@
           expect(element.itemDragged).to.be.false;
         });
 
-        it('should activate if an item is dragged within bounds', done => {
+        it('should activate if an item is dragged', done => {
           dragMock
           .dragStart(testDraggable)
           .dragEnter(element)
@@ -74,14 +83,14 @@
               expect(element.itemDragged).to.be.true;
             }, 100);
           })
-          .delay(200)
+          .delay(100)
           .drop(element, () => {
             done();
           });
         });
 
 
-        it('should deactivate if item is moved out of bounds without dropping', done => {
+        it('should deactivate if item is moved out without dropping', done => {
           dragMock
           .dragStart(testDraggable)
           .dragEnter(element)
@@ -90,19 +99,19 @@
               expect(element.itemDragged).to.be.true;
             }, 100);
           })
-          .delay(200)
+          .delay(100)
           .dragLeave(element, (e, eName) => {
             setTimeout(() => {
               expect(element.itemDragged).to.be.false;
             }, 100);
           })
-          .delay(200)
+          .delay(100)
           .drop(element, () => {
             done();
           });
         });
 
-        it('should deactivate after item is dropped within bounds', done => {
+        it('should deactivate after item is dropped', done => {
           dragMock
           .dragStart(testDraggable)
           .dragEnter(element)
@@ -111,7 +120,7 @@
               expect(element.itemDragged).to.be.true;
             }, 100);
           })
-          .delay(200)
+          .delay(100)
           .drop(element, () => {
             setTimeout(() => {
               expect(element.itemDragged).to.be.false;
@@ -120,7 +129,7 @@
           });
         });
 
-        it('should fire an event containing the File and drop position when a File is dropped within bounds', done => {
+        it('should fire an event containing the File and drop position when a File is dropped', done => {
           const dropPosition = {
             clientX: element.getBoundingClientRect().left + 50,
             clientY: element.getBoundingClientRect().top + 50
@@ -143,7 +152,7 @@
 
             expect(e.detail.type).to.equal('file');
 
-            expect(e.detail.items).to.have.length(0);
+            expect(e.detail.items).to.have.length(3);
 
             expect(e.detail.position.x).to.equal(dropPosition.clientX);
             expect(e.detail.position.y).to.equal(dropPosition.clientY);
@@ -158,11 +167,11 @@
           .dragStart(testFile)
           .dragEnter(element)
           .dragOver(element)
-          .delay(200)
+          .delay(100)
           .drop(element, dropPosition);
         });
 
-        it('should fire an event containing the File and viewport center as position when a File is pasted within bounds', done => {
+        it('should fire an event containing the File and viewport center as position when a File is pasted', done => {
           const test = (e) => {
             expect(e.detail).to.have.property('type');
             expect(e.detail).to.have.property('items');
@@ -202,7 +211,7 @@
           window.dispatchEvent(fakePasteEvent);
         });
 
-        it('should fire an event containing the DOMElement Data and drop position when a DOM Element is dropped within bounds', done => {
+        it('should fire an event containing the DOMElement data and drop position when a DOM Element is dropped', done => {
           const dropPosition = {
             clientX: element.getBoundingClientRect().left + 50,
             clientY: element.getBoundingClientRect().top + 50
@@ -238,8 +247,98 @@
           .dragStart(testDraggable)
           .dragEnter(element)
           .dragOver(element)
-          .delay(200)
+          .delay(100)
           .drop(element, dropPosition);
+        });
+
+        it('should fire an error event if accepted types are set and at least File is dropped without an accepted file type', done => {
+          element.set('accepts', 'application/pdf, image/png');
+
+          const dropPosition = {
+            clientX: element.getBoundingClientRect().left + 50,
+            clientY: element.getBoundingClientRect().top + 50
+          }
+
+          const errorHandler = e => {
+            expect(e.detail).to.have.property('text');
+            expect(e.detail.text).to.be.a('String');
+            expect(e.detail.text).to.equal('Unsupported file type');
+
+            endSuccess();
+          }
+
+          const successHandler = () => {
+            removeListeners();
+            done(new Error('item-dropped was called'));
+          }
+
+          const removeListeners = () => {
+            element.removeEventListener('error', errorHandler);
+            element.removeEventListener('item-dropped', successHandler);
+          }
+
+          // @NOTE Wait before removing event listeners, otherwise we
+          // won't be able to test for erroneous `item-dropped` events.
+          const endSuccess = () => {
+            setTimeout(() => {
+              removeListeners();
+              done();
+            }, 100);
+          }
+
+          element.addEventListener('error', errorHandler);
+          element.addEventListener('item-dropped', successHandler);
+
+          dragMock
+          .dragStart(testFile)
+          .dragEnter(element)
+          .dragOver(element)
+          .delay(100)
+          .drop(element, dropPosition);
+        });
+
+        it('should fire an error event if accepted types are set and at least File is pasted without an accepted file type', done => {
+          element.set('accepts', 'application/pdf, image/png');
+
+          const errorHandler = e => {
+            expect(e.detail).to.have.property('text');
+            expect(e.detail.text).to.be.a('String');
+            expect(e.detail.text).to.equal('Unsupported file type');
+
+            endSuccess();
+          }
+
+          const successHandler = () => {
+            removeListeners();
+            done(new Error('item-dropped was called'));
+          }
+
+          const removeListeners = () => {
+            element.removeEventListener('error', errorHandler);
+            element.removeEventListener('item-dropped', successHandler);
+          }
+
+          // @NOTE Wait before removing event listeners, otherwise we
+          // won't be able to test for erroneous `item-dropped` events.
+          const endSuccess = () => {
+            setTimeout(() => {
+              removeListeners();
+              done();
+            }, 100);
+          }
+
+          element.addEventListener('error', errorHandler);
+          element.addEventListener('item-dropped', successHandler);
+
+          const fakePasteEvent = new CustomEvent('paste', {
+            detail: {
+              fakeClipboardData: {
+                items: [ { type: 'image/svg', kind: 'file' }]
+              }
+            }
+          });
+
+          window.dispatchEvent(fakePasteEvent);
         });
       });
     </script>

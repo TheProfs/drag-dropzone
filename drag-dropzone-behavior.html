@@ -4,11 +4,43 @@
    */
   dragDropzoneBehavior = {
     properties: {
+      /**
+       * Set to `true` while an item is being dragged over the dropzone
+       */
       itemDragged: {
         type: Boolean,
         value: false,
         readOnly: true
+      },
+      /**
+       * Metadata describing which file types are accepted.
+       * You can add more than one file type by separating them with
+       * a comma, e.g "application/pdf, image/png"
+       *
+       * @type {{types: String}}
+       */
+      accepts: {
+        type: String,
+        value: ''
       }
+
+      /**
+       * Fired when an item is dropped on the dropzone
+       *
+       * @event item-dropped
+       * @param {String} type Type of element dropped, can be 'DOMElement'
+       * or 'file'
+       * @param {Array} items List of dropped items
+       * @param {Object} position x/y coordinates of drop position
+       */
+
+       /**
+        * Fired if an item is dropped but doesn't pass the `accepts` file type
+        * checks
+        *
+        * @event error
+        * @param {String} text The error message
+        */
     },
 
     attached: function() {
@@ -28,10 +60,24 @@
           this._itemDropped('DOMElement', [e.dataTransfer.getData('data')], position);
           break;
         default:
-          this._itemDropped('file', e.dataTransfer.files, position);
+          // @NOTE `fake-files` data used for testing
+          const files = e.dataTransfer.getData('fake-files') ?
+            e.dataTransfer.getData('fake-files') :
+            e.dataTransfer.files;
+
+          this._filesDropped('file', files, position);
       }
 
       this._deactivateDropzone(e);
+    },
+
+    _filesDropped: function(type, files, position) {
+      if (this._haveInvalidTypes(files)) {
+        this.fire('error', { text: 'Unsupported file type'});
+        return false;
+      }
+
+      this._itemDropped(type, files, position);
     },
 
     _itemDropped: function(type, items, position) {
@@ -40,30 +86,26 @@
 
     _activateDropzone: function(e) {
       this._setItemDragged(true);
-
-      if (e) {
-        e.preventDefault();
-      }
+      this._cancelDefault(e);
     },
 
     _deactivateDropzone: function(e) {
       this._setItemDragged(false);
-
-      if (e) {
-        e.preventDefault();
-      }
+      this._cancelDefault(e);
     },
 
     _cancelDefault: function(e) {
-      e.preventDefault();
+      if (e) {
+        e.preventDefault();
+      }
     },
 
     _handlePaste: function(e) {
       const position = this._createPoint();
 
-      // @NOTE For testing, since we can't really simulate `clipboardData`
+      // @NOTE `fakeClipboardData` used for testing
       if (e.detail && e.detail.fakeClipboardData) {
-        this._itemDropped('file', e.detail.fakeClipboardData.items, position);
+        this._filesDropped('file', e.detail.fakeClipboardData.items, position);
 
         return false;
       }
@@ -75,7 +117,7 @@
           const item = items[index];
 
           if (item.kind === "file") {
-            this._itemDropped('file', [item.getAsFile()], position);
+            this._filesDropped('file', [item.getAsFile()], position);
           }
         }
       }
@@ -83,6 +125,32 @@
 
     _createPoint: function(x = window.innerWidth / 2, y = window.innerHeight / 2) {
       return { x, y };
+    },
+
+    _haveInvalidTypes: function(files) {
+      files = [...files];
+
+      if (files.some(this._isInvalidType.bind(this))) {
+        return true;
+      }
+
+      return false;
+    },
+
+    _isInvalidType: function(file) {
+      if (!this.accepts.length) {
+        return false;
+      }
+
+      if (!file) {
+        return true;
+      }
+
+      const fileTypeOk = this.accepts.split(',')
+        .map(item => item.trim())
+        .includes(file.type);
+
+      return !fileTypeOk;
     }
   };
 </script>

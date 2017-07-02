@@ -63,6 +63,9 @@
       <p>
         Drag the draggable HTML element below, or drag a File directly
         from your device.
+
+        You can listen on the <code>item-dropped</code> event for all
+        dropped items.
       </p>
 
       <div ondragstart="drag(event)" draggable="true">
@@ -85,6 +88,19 @@
         </template>
       </demo-snippet>
 
+      <h3>Restrict file types that can be dropped/pasted</h3>
+
+      <p>
+        You can restrict the types of files that can be dropped/pasted.
+        In these cases, an <code>error</code> event is fired.
+      </p>
+
+      <demo-snippet id="restricted-types" class="demo-snippet">
+        <template>
+          <drag-dropzone accepts="application/pdf"></drag-dropzone>
+        </template>
+      </demo-snippet>
+
       <script>
         function drag(e) {
           e.dataTransfer.setData('type', 'DOMElement');
@@ -93,6 +109,10 @@
 
         document.querySelectorAll('.demo-snippet').forEach(snippet => {
           snippet.addEventListener('item-dropped', console.log)
+        })
+
+        document.querySelector('#restricted-types').addEventListener('error', (e) => {
+          alert(e.detail.text);
         })
       </script>
     </div>
