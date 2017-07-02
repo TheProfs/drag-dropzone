@@ -1,6 +1,6 @@
 {
   "name": "drag-dropzone",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Dropzone for files and DOM elements in Polymer 1.x",
   "main": "drag-dropzone.html",
   "dependencies": {
