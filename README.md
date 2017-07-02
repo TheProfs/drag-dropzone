@@ -49,11 +49,11 @@ you want to receive when it's dropped on the drop zone.
 
 ## Restricting file types
 
-Set an `accepts` attribute with a comma-separated `String` of the types
+Set an `accept` attribute with a comma-separated `String` of the types
 it should accept.
 
 ```html
-<drag-dropzone accepts="application/pdf, image/png"></drag-dropzone>
+<drag-dropzone accept="application/pdf, image/png"></drag-dropzone>
 
 <script>
   // Assuming you dropped anything other than a PNG or PDF

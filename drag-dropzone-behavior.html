@@ -19,7 +19,7 @@
        *
        * @type {{types: String}}
        */
-      accepts: {
+      accept: {
         type: String,
         value: ''
       }
@@ -35,7 +35,7 @@
        */
 
        /**
-        * Fired if an item is dropped but doesn't pass the `accepts` file type
+        * Fired if an item is dropped but doesn't pass the `accept` file type
         * checks
         *
         * @event item-error
@@ -138,7 +138,7 @@
     },
 
     _isInvalidType: function(file) {
-      if (!this.accepts.length) {
+      if (!this.accept.length) {
         return false;
       }
 
@@ -146,7 +146,7 @@
         return true;
       }
 
-      const fileTypeOk = this.accepts.split(',')
+      const fileTypeOk = this.accept.split(',')
         .map(item => item.trim())
         .includes(file.type);
 

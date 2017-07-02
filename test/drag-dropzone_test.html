@@ -252,7 +252,7 @@
         });
 
         it('should fire an error event if accepted types are set and at least File is dropped without an accepted file type', done => {
-          element.set('accepts', 'application/pdf, image/png');
+          element.set('accept', 'application/pdf, image/png');
 
           const dropPosition = {
             clientX: element.getBoundingClientRect().left + 50,
@@ -298,7 +298,7 @@
         });
 
         it('should fire an error event if accepted types are set and at least File is pasted without an accepted file type', done => {
-          element.set('accepts', 'application/pdf, image/png');
+          element.set('accept', 'application/pdf, image/png');
 
           const errorHandler = e => {
             expect(e.detail).to.have.property('text');
