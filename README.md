@@ -53,20 +53,11 @@ Set an `accepts` attribute with a comma-separated `String` of the types
 it should accept.
 
 ```html
-<div ondragstart="drag(event)" draggable="true">Draggable thingy</div>
 <drag-dropzone accepts="application/pdf, image/png"></drag-dropzone>
 
 <script>
-  function drag(e) {
-    e.dataTransfer.setData('type', 'DOMElement');
-    e.dataTransfer.setData('data', 'foo-bar');
-  }
-
-  document.querySelector('drag-dropzone').addEventListener('item-dropped', e => {
-    console.log(e.detail); // Logs items and drop position
-  })
-
-  document.querySelector('drag-dropzone').addEventListener('error', e => {
+  // Assuming you dropped anything other than a PNG or PDF
+  document.querySelector('drag-dropzone').addEventListener('item-error', e => {
     console.log(e.detail.text); // Logs 'Unsupported file type'
   })
 </script>

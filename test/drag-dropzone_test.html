@@ -273,7 +273,7 @@
           }
 
           const removeListeners = () => {
-            element.removeEventListener('error', errorHandler);
+            element.removeEventListener('item-error', errorHandler);
             element.removeEventListener('item-dropped', successHandler);
           }
 
@@ -286,7 +286,7 @@
             }, 100);
           }
 
-          element.addEventListener('error', errorHandler);
+          element.addEventListener('item-error', errorHandler);
           element.addEventListener('item-dropped', successHandler);
 
           dragMock
@@ -314,7 +314,7 @@
           }
 
           const removeListeners = () => {
-            element.removeEventListener('error', errorHandler);
+            element.removeEventListener('item-error', errorHandler);
             element.removeEventListener('item-dropped', successHandler);
           }
 
@@ -327,7 +327,7 @@
             }, 100);
           }
 
-          element.addEventListener('error', errorHandler);
+          element.addEventListener('item-error', errorHandler);
           element.addEventListener('item-dropped', successHandler);
 
           const fakePasteEvent = new CustomEvent('paste', {

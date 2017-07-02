@@ -92,7 +92,7 @@
 
       <p>
         You can restrict the types of files that can be dropped/pasted.
-        In these cases, an <code>error</code> event is fired.
+        In these cases, an <code>item-error</code> event is fired.
       </p>
 
       <demo-snippet id="restricted-types" class="demo-snippet">
@@ -111,7 +111,7 @@
           snippet.addEventListener('item-dropped', console.log)
         })
 
-        document.querySelector('#restricted-types').addEventListener('error', (e) => {
+        document.querySelector('#restricted-types').addEventListener('item-error', (e) => {
           alert(e.detail.text);
         })
       </script>

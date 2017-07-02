@@ -38,7 +38,7 @@
         * Fired if an item is dropped but doesn't pass the `accepts` file type
         * checks
         *
-        * @event error
+        * @event item-error
         * @param {String} text The error message
         */
     },
@@ -73,7 +73,7 @@
 
     _filesDropped: function(type, files, position) {
       if (this._haveInvalidTypes(files)) {
-        this.fire('error', { text: 'Unsupported file type'});
+        this.fire('item-error', {text: 'Unsupported file type'});
         return false;
       }
 
