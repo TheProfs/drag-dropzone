@@ -21,8 +21,7 @@ any element. You can either use the element itself, or just the behavior.
 
 <script>
   document.querySelector('drag-dropzone').addEventListener('item-dropped', e => {
-    console.log(e.detail);
-    // logs item and dropped position
+    console.log(e.detail); // Logs items and drop position
   })
 </script>
 ```
@@ -43,7 +42,32 @@ you want to receive when it's dropped on the drop zone.
   }
 
   document.querySelector('drag-dropzone').addEventListener('item-dropped', e => {
-    console.log(e.detail); // includes the item
+    console.log(e.detail); // Logs items and drop position
+  })
+</script>
+```
+
+## Restricting file types
+
+Set an `accepts` attribute with a comma-separated `String` of the types
+it should accept.
+
+```html
+<div ondragstart="drag(event)" draggable="true">Draggable thingy</div>
+<drag-dropzone accepts="application/pdf, image/png"></drag-dropzone>
+
+<script>
+  function drag(e) {
+    e.dataTransfer.setData('type', 'DOMElement');
+    e.dataTransfer.setData('data', 'foo-bar');
+  }
+
+  document.querySelector('drag-dropzone').addEventListener('item-dropped', e => {
+    console.log(e.detail); // Logs items and drop position
+  })
+
+  document.querySelector('drag-dropzone').addEventListener('error', e => {
+    console.log(e.detail.text); // Logs 'Unsupported file type'
   })
 </script>
 ```
