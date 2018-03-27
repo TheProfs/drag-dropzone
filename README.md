@@ -28,8 +28,11 @@ any element. You can either use the element itself, or just the behavior.
 
 ## Usage with DOM elements
 
-Just make sure your DOM elements declare `type="DOMElement"` and the `data`
-you want to receive when it's dropped on the drop zone.
+Just make sure your DOM elements declare the following:
+
+- `allow-drop=true`
+- `type="DOMElement"`
+- The `data` you want to receive when it's dropped on the drop zone.
 
 ```html
 <div ondragstart="drag(event)" draggable="true">Draggable thingy</div>
@@ -37,6 +40,7 @@ you want to receive when it's dropped on the drop zone.
 
 <script>
   function drag(e) {
+    e.dataTransfer.setData('allow-drop', true);
     e.dataTransfer.setData('type', 'DOMElement');
     e.dataTransfer.setData('data', 'foo-bar');
   }
