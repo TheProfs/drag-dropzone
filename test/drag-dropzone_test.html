@@ -42,6 +42,7 @@
         }
 
         window.dragStartDOMElement = (e) => {
+          e.dataTransfer.setData('allow-drop', true);
           e.dataTransfer.setData('type', 'DOMElement');
           e.dataTransfer.setData('data', 'foo-bar');
           e.preventDefault();
