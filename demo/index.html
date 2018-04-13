@@ -105,6 +105,7 @@
         function drag(e) {
           e.dataTransfer.setData('type', 'DOMElement');
           e.dataTransfer.setData('data', 'foo-bar');
+          e.dataTransfer.setData('allow-drop', true);
         }
 
         document.querySelectorAll('.demo-snippet').forEach(snippet => {
