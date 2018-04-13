@@ -82,6 +82,10 @@
       this._itemDropped(type, files, position);
     },
 
+    _textDropped: function(type, string, position) {
+      this.fire('text-dropped', { type, string, position });
+    },
+
     _itemDropped: function(type, items, position) {
       this.fire('item-dropped', {type, items, position});
     },
@@ -122,7 +126,13 @@
 
           if (item.kind === "file") {
             this._filesDropped('file', [item.getAsFile()], position);
+
+            return
           }
+
+          item.getAsString(string => {
+            this._textDropped('string', string, position);
+          })
         }
       }
     },
