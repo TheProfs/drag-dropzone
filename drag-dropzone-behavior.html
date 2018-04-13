@@ -118,23 +118,41 @@
         return false;
       }
 
+      const items = this._getDataTransferItemsFromEvent(e);
+
+      for (const item of items) {
+        if (item.kind === 'file') {
+          this._filesDropped('file', [ item.getAsFile() ], position);
+
+          return
+        }
+
+        item.getAsString(string => {
+          this._textDropped('string', string, position);
+        })
+      }
+    },
+
+    /*
+     * @NOTE
+     * - This function returns an `Array` of `DataTransferItems` from a
+     *  `paste` event.
+     */
+    _getDataTransferItemsFromEvent: function(e) {
+      const arr = []
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
 
-      for (let index in items) {
-        if ({}.hasOwnProperty.call(items, index)) {
-          const item = items[index];
-
-          if (item.kind === "file") {
-            this._filesDropped('file', [item.getAsFile()], position);
-
-            return
-          }
-
-          item.getAsString(string => {
-            this._textDropped('string', string, position);
-          })
-        }
+      for (const item of items) {
+        arr.push(item);
       }
+
+      // @NOTE
+      // We filter-out duplicate events with `kind = 'string'` if
+      // a File was pasted. Pasting Files produces a 2nd spurious event
+      // with `kind = 'string'` and payload the filename of the pasted file.
+      return arr.some(item => item.kind === 'file')
+        ? arr.filter(item => item.kind !== 'string')
+        : arr
     },
 
     _createPoint: function(x = window.innerWidth / 2, y = window.innerHeight / 2) {
